@@ -1,0 +1,11 @@
+[package]
+name = "tantivy-bpe-tokenizer"
+version = "0.1.0"
+authors = ["Hitoshi Manabe <int.toshi13@gmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+tantivy = "0.14"
+tokenizers = { git = "https://github.com/huggingface/tokenizers.git", rev = "c046da7679d188c9013069450b25ebab837de19a"}
