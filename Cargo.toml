@@ -8,4 +8,4 @@ edition = "2018"
 
 [dependencies]
 tantivy = "0.14"
-tokenizers = { git = "https://github.com/huggingface/tokenizers.git", rev = "c046da7679d188c9013069450b25ebab837de19a"}
+tokenizers = { git = "https://github.com/mana-ysh/tokenizers.git", rev = "45dd5cc76c11ee2060dd99fa3da36d60ec7a6041"}

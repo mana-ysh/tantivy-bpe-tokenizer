@@ -2,7 +2,7 @@ use crate::stream::BpeTokenStream;
 use tantivy::tokenizer::{BoxTokenStream, Tokenizer};
 use tokenizers::Tokenizer as HuggingfaceTokenizer;
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct BpeTokenizer {
     hf_tokenizer: HuggingfaceTokenizer
 }
@@ -12,13 +12,6 @@ impl BpeTokenizer {
         BpeTokenizer {
             hf_tokenizer: HuggingfaceTokenizer::from_file(json_path).unwrap()
         }
-    }
-}
-
-impl Clone for BpeTokenizer {
-    fn clone(&self) -> Self {
-        // TODO:
-        panic!("Clone traint is not implemented");
     }
 }
 
