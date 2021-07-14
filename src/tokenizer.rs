@@ -19,9 +19,21 @@ impl Tokenizer for BpeTokenizer {
     fn token_stream<'a>(&self, text: &'a str) -> BoxTokenStream<'a> {
         // NOTE: consider [UNK].
         let output = self.hf_tokenizer.encode(text, true).unwrap();
+        let internal_tokens: Vec<String> = output.get_tokens()
+            .iter()
+            .zip(output.get_offsets().iter())
+            .map(|(token, offset)| {
+                if token == "[UNK]" {
+                    text[offset.0..offset.1].to_string()
+                 } else {
+                    token.to_string()
+                }
+            })
+            .collect();
+
         BoxTokenStream::from(
             BpeTokenStream {
-                internal_tokens: output.get_tokens().to_vec(),
+                internal_tokens: internal_tokens,
                 token: Default::default(),
                 index: 0,
                 offset_from: 0,
@@ -34,7 +46,7 @@ impl Tokenizer for BpeTokenizer {
 mod tests {
     use std::path::PathBuf;
     use super::*;
-    use tantivy::tokenizer::{BoxTokenStream, Token, Tokenizer};
+    use tantivy::tokenizer::{Token, Tokenizer};
 
     #[test]
     fn test_tokenizer() {
@@ -68,5 +80,26 @@ mod tests {
         assert_eq!(tokens[3].offset_from, 7);
         assert_eq!(tokens[3].offset_to, 10);
         assert_eq!(tokens[3].position, 3);
+
+        // UNK case (Japanese)
+        let mut token_stream = tokenizer.token_stream("あいう");
+        let mut tokens: Vec<Token> = vec![];
+        token_stream.process(&mut |token: &Token| tokens.push(token.clone()));
+
+        assert_eq!(tokens.len(), 3);
+        assert_eq!(tokens[0].text, "あ");
+        assert_eq!(tokens[0].offset_from, 0);
+        assert_eq!(tokens[0].offset_to, 3);
+        assert_eq!(tokens[0].position, 0);
+
+        assert_eq!(tokens[1].text, "い");
+        assert_eq!(tokens[1].offset_from, 3);
+        assert_eq!(tokens[1].offset_to, 6);
+        assert_eq!(tokens[1].position, 1);
+
+        assert_eq!(tokens[2].text, "う");
+        assert_eq!(tokens[2].offset_from, 6);
+        assert_eq!(tokens[2].offset_to, 9);
+        assert_eq!(tokens[2].position, 2);
     }
 }
